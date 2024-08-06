@@ -1,0 +1,15 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Подтверждение удаления приема{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Вы уверены, что хотите удалить этот прием?</h1>
+    <p>{{ appointment.date }} - {{ appointment.doctor }} - {{ appointment.service.name if appointment.service else appointment.reason }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

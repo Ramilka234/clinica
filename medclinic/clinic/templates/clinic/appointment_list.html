@@ -1,0 +1,21 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Список приемов{% endblock %}
+
+{% block content %}
+<h1>Список приемов</h1>
+<ul>
+        {% for appointment in appointments %}
+            <li>
+                {{ appointment.date }} - {{ appointment.doctor }} -
+                {% if appointment.service %}
+                    {{ appointment.service.name }}
+                {% else %}
+                    {{ appointment.reason }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+<a href="{% url 'index' %}">На главную</a>
+
+{% endblock %}

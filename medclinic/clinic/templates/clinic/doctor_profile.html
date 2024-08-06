@@ -1,0 +1,13 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Профиль врача{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ doctor }}</h1>
+    <p>Специализация: {{ doctor.specialization }}</p>
+    <p>Телефон: {{ doctor.phone }}</p>
+    <p>Расписание приема: {{ doctor.schedule }}</p>
+    <!-- Дополнительные поля профиля врача (фото, опыт работы) могут быть добавлены здесь -->
+</div>
+{% endblock %}

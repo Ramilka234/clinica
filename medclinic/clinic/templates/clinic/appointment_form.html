@@ -1,0 +1,123 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Запись на прием{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Запись на прием</h1>
+    <form id="appointment-form" method="post" action="{% url 'appointment_create' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Записаться</button>
+    </form>
+    <div id="errors" style="color: red;"></div>
+    <div id="doctor-schedule" style="display:none;">
+        <h3>Расписание врача</h3>
+        <p id="schedule"></p>
+    </div>
+    <!-- Добавлено для отображения ошибок -->
+</div>
+
+<!-- Подключение полной версии jQuery -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        var service_select = $('#id_service');  // Изменено для соответствия идентификатору поля формы
+        var doctor_select = $('#id_doctor');    // Изменено для соответствия идентификатору поля формы
+        var schedule_div = $('#doctor-schedule');
+        var schedule_p = $('#schedule');
+        var form = $('#appointment-form');
+        var errors_div = $('#errors');
+
+        function toggleScheduleDisplay(show) {
+            if (show) {
+                schedule_div.show();
+            } else {
+                schedule_div.hide();
+            }
+        }
+
+        service_select.change(function () {
+            var service_id = $(this).val();
+            console.log("Service selected: ", service_id);  // Отладочное сообщение
+            if (service_id) {
+                $.ajax({
+                    url: '{% url "ajax_load_doctors" %}',  // URL для представления AJAX
+                    data: {
+                        'service_id': service_id
+                    },
+                    success: function (data) {
+                        console.log("Received data: ", data);  // Отладочное сообщение
+                        doctor_select.html('<option value="">---------</option>');
+                        if (data.doctors && data.doctors.length > 0) {
+                            data.doctors.forEach(function(doctor) {
+                                doctor_select.append('<option value="' + doctor.id + '">' + doctor.first_name + ' ' + doctor.last_name + '' + '(' + doctor.specialization + ')' + '</option>');
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Ошибка при загрузке врачей:", status, error);
+                    }
+                });
+            } else {
+                doctor_select.html('<option value="">---------</option>');
+            }
+        });
+
+        doctor_select.change(function () {
+            var doctor_id = $(this).val();
+            if (doctor_id) {
+                $.ajax({
+                    url: '{% url "ajax_load_doctor_schedule" %}',
+                    data: {
+                        'doctor_id': doctor_id
+                    },
+                    success: function (data) {
+                        if (data.schedule) {
+                            schedule_p.text(data.schedule);
+                            toggleScheduleDisplay(true);
+                        } else {
+                            schedule_p.text('');
+                            toggleScheduleDisplay(false);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Ошибка при загрузке расписания:", status, error);
+                        toggleScheduleDisplay(false);
+                    }
+                });
+            } else {
+                schedule_p.text('');
+                toggleScheduleDisplay(false);
+            }
+        });
+
+        form.submit(function (event) {
+            event.preventDefault();  // Предотвращаем отправку формы
+            errors_div.html('');
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize(),
+                success: function (data) {
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        var errors = data.errors;
+                        for (var key in errors) {
+                            if (errors.hasOwnProperty(key)) {
+                                errors_div.append('<p>' + errors[key][0] + '</p>');
+                            }
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Ошибка при отправке формы:", status, error);
+                }
+            });
+        });
+
+        toggleScheduleDisplay(false);
+    });
+</script>
+{% endblock %}

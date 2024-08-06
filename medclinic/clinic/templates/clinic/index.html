@@ -1,0 +1,46 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Добро пожаловать в нашу медклинику!</h1>
+    <p>Мы рады приветствовать вас в нашей клинике. Мы предлагаем широкий спектр медицинских услуг для вас и вашей семьи.</p>
+
+    <h2>Наши услуги</h2>
+    <ul>
+        {% for service in services %}
+        <li>{{ service.name }} - {{ service.description }} ({{ service.price }} руб.)</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Новости и акции</h2>
+    <ul>
+        {% for news_item in news %}
+            <li>{{ news_item.title }} - {{ news_item.date }}</li>
+            <p>{{ news_item.content|truncatewords:20 }}</p>
+        {% endfor %}
+    </ul>
+
+    <h2>Отзывы пациентов</h2>
+    <ul>
+        {% for review in reviews %}
+            <li>
+                <strong>{{ review.user.first_name }} {{ review.user.last_name }}</strong> - {{ review.date|date:"d-m-Y" }}<br>
+                {{ review.content }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if user.is_authenticated %}
+    <h2>Оставить отзыв</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </form>
+    {% else %}
+    <p>Пожалуйста, <a href="{% url 'login' %}">войдите в систему</a>, чтобы оставить отзыв.</p>
+    {% endif %}
+</div>
+{% endblock %}

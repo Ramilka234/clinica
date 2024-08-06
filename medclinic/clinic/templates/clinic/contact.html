@@ -1,0 +1,29 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Контактная информация{% endblock %}
+
+{% block content %}
+<h1>Контактная информация</h1>
+<p>Адрес: Улица, Город, Страна</p>
+<p>Телефон: +7 (123) 456-78-90</p>
+<h2>Карта проезда</h2>
+<div id="map" style="width: 600px; height: 400px;"></div>
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=ac44690a-1b0f-4fda-9df8-40ded1b70197" type="text/javascript"></script>
+    <script type="text/javascript">
+        ymaps.ready(init);
+        function init(){
+            var myMap = new ymaps.Map("map", {
+                center: [55.76, 37.64], // Замените на координаты вашего местоположения
+                zoom: 10
+            });
+
+            var myPlacemark = new ymaps.Placemark([55.76, 37.64], {
+                hintContent: 'Наш офис',
+                balloonContent: '123 Примерная улица, Город, Страна'
+            });
+
+            myMap.geoObjects.add(myPlacemark);
+        }
+    </script>
+<a href="{% url 'index' %}">На главную</a>
+{% endblock %}

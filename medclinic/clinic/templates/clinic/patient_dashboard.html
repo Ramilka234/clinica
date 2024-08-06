@@ -1,0 +1,42 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+    <h1>Личный кабинет</h1>
+    <h2>Ваши данные</h2>
+    <p>Имя: {{ patient.user.first_name }}</p>
+    <p>Фамилия: {{ patient.user.last_name }}</p>
+    <p>Дата рождения: {{ patient.date_of_birth }}</p>
+    <p>Телефон: {{ patient.phone }}</p>
+    <a href="{% url 'edit_profile' %}">Редактировать профиль</a>
+    <h2>История приемов</h2>
+    <ul>
+        {% for appointment in appointments %}
+            <li>
+                {{ appointment.date }} - {{ appointment.doctor }} -
+                {% if appointment.service %}
+                    {{ appointment.service.name }}
+                {% else %}
+                    {{ appointment.reason }}
+                 {% endif %}
+                {% if appointment.date > today %}
+                    <a href="{% url 'appointment_update' appointment.pk %}">Изменить</a>
+                    <form method="post" action="{% url 'appointment_delete' appointment.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Отменить</button>
+                    </form>
+                {% endif %}
+            </li>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Результаты анализов</h2>
+    <ul>
+        {% for result in test_results %}
+            <li>{{ result.date }} - {{ result.test_name }}: {{ result.result }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'index' %}">На главную</a>
+{% endblock %}

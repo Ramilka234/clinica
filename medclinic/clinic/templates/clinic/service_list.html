@@ -1,0 +1,43 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Наши услуги{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Наши услуги</h1>
+    <p>Мы предлагаем широкий спектр медицинских услуг.</p>
+    <div class="form-group">
+        <input type="text" class="form-control" id="service-search" placeholder="Поиск по услугам...">
+    </div>
+    <div class="row" id="services-list">
+        {% for service in services %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="card-text">{{ service.description }}</p>
+                    <p class="card-text"><strong>Стоимость: </strong>{{ service.price }} руб.</p>
+                    <a href="{% url 'appointment_create' %}" class="btn btn-primary">Записаться</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#service-search').on('input', function() {
+            var searchText = $(this).val().toLowerCase();
+            $('#services-list .col-md-4').each(function() {
+                var serviceName = $(this).find('.card-title').text().toLowerCase();
+                if (serviceName.includes(searchText)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
